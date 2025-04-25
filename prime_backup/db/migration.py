@@ -10,6 +10,7 @@ from prime_backup.config.config import Config
 from prime_backup.db import schema, db_constants
 from prime_backup.db.db_file_backup import _DbFileBackupHelper
 from prime_backup.exceptions import PrimeBackupError
+from prime_backup.config.database_config import DatabaseConfig
 
 
 class BadDbVersion(PrimeBackupError):
@@ -35,6 +36,9 @@ class DbMigration:
 		inspector = Inspector.from_engine(self.engine)
 		if inspector.has_table(schema.DbMeta.__tablename__):
 			with Session(self.engine) as session, session.begin():
+				#ensure we uses in-memory temp storage if configured: https://www.sqlite.org/pragma.html#pragma_temp_store
+				if DatabaseConfig.use_memory_tempstore:
+					session.execute(text('PRAGMA temp_store = 2'))
 				dbm: Optional[schema.DbMeta] = session.get(schema.DbMeta, self.DB_MAGIC_INDEX)
 				if dbm is None:
 					raise ValueError('table DbMeta is empty')

@@ -17,6 +17,7 @@ class VacuumSqliteJob(BasicCrontabJob):
 	def __init__(self, scheduler: BaseScheduler, task_manager: 'TaskManager'):
 		super().__init__(scheduler, task_manager)
 		self.config: CompactDatabaseConfig = self._root_config.database.compact
+		self.use_memory_tempfile = self._root_config.database.vacuum_use_memory_tempfile
 
 	@property
 	@override
@@ -30,4 +31,4 @@ class VacuumSqliteJob(BasicCrontabJob):
 
 	@override
 	def run(self):
-		self.run_task_with_retry(VacuumSqliteTask(self.get_command_source(), use_memory_tempfile= self.config.use_memory_tempfile), True).report()
+		self.run_task_with_retry(VacuumSqliteTask(self.get_command_source(), use_memory_tempfile= self.use_memory_tempfile), True).report()

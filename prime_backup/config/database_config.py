@@ -21,3 +21,4 @@ class BackUpDatabaseConfig(CrontabJobSetting):
 class DatabaseConfig(Serializable):
 	compact: CompactDatabaseConfig = CompactDatabaseConfig()
 	backup: BackUpDatabaseConfig = BackUpDatabaseConfig()
+	use_memory_tempstore: bool = False

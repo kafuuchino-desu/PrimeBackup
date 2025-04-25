@@ -2,7 +2,7 @@ import contextlib
 from pathlib import Path
 from typing import Optional, ContextManager
 
-from sqlalchemy import create_engine, Engine
+from sqlalchemy import create_engine, Engine, text
 from sqlalchemy.orm import Session
 
 from prime_backup.config.config import Config
@@ -10,6 +10,7 @@ from prime_backup.db import db_constants
 from prime_backup.db.migration import DbMigration
 from prime_backup.db.session import DbSession
 from prime_backup.types.hash_method import HashMethod
+from prime_backup.config.database_config import DatabaseConfig
 
 
 class DbAccess:
@@ -75,6 +76,9 @@ class DbAccess:
 	@contextlib.contextmanager
 	def open_session(cls) -> ContextManager['DbSession']:
 		with Session(cls.__ensure_engine()) as session, session.begin():
+			#ensure we uses in-memory temp storage if configured: https://www.sqlite.org/pragma.html#pragma_temp_store
+			if DatabaseConfig.use_memory_tempstore:
+				session.execute(text('PRAGMA temp_store = 2'))
 			yield DbSession(session, cls.__db_file_path)
 
 	@classmethod

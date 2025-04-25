@@ -30,4 +30,4 @@ class VacuumSqliteJob(BasicCrontabJob):
 
 	@override
 	def run(self):
-		self.run_task_with_retry(VacuumSqliteTask(self.get_command_source()), True).report()
+		self.run_task_with_retry(VacuumSqliteTask(self.get_command_source(), use_memory_tempfile= self.config.use_memory_tempfile), True).report()

@@ -11,9 +11,10 @@ from prime_backup.mcdr.text_components import TextComponents
 
 
 class VacuumSqliteTask(HeavyTask[None]):
-	def __init__(self, source: CommandSource, target_path: Optional[Path] = None):
+	def __init__(self, source: CommandSource, target_path: Optional[Path] = None, use_memory_tempfile: Optional[bool] = False):
 		super().__init__(source)
 		self.target_path = target_path
+		self.use_memory_tempfile = use_memory_tempfile
 
 	@property
 	@override
@@ -24,7 +25,7 @@ class VacuumSqliteTask(HeavyTask[None]):
 	def run(self) -> None:
 		self.reply_tr('start')
 		t = time.time()
-		diff = VacuumSqliteAction(self.target_path).run()
+		diff = VacuumSqliteAction(self.target_path, self.use_memory_tempfile).run()
 		cost = time.time() - t
 		self.reply_tr(
 			'done',

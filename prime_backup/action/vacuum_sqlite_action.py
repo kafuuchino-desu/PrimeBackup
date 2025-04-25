@@ -9,9 +9,10 @@ from prime_backup.types.size_diff import SizeDiff
 
 
 class VacuumSqliteAction(Action[SizeDiff]):
-	def __init__(self, target_path: Optional[Path] = None):
+	def __init__(self, target_path: Optional[Path] = None, use_memory_tempfile: Optional[bool] = False):
 		super().__init__()
 		self.target_path = target_path
+		self.use_memory_tempfile = use_memory_tempfile
 
 	@override
 	def run(self) -> SizeDiff:
@@ -25,7 +26,7 @@ class VacuumSqliteAction(Action[SizeDiff]):
 			into_file = None
 
 		with DbAccess.open_session() as session:
-			session.vacuum(into_file)
+			session.vacuum(into_file, self.use_memory_tempfile)
 
 		if self.target_path is not None:
 			after_size = self.target_path.stat().st_size

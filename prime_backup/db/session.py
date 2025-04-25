@@ -104,8 +104,13 @@ class DbSession:
 		with self.session.no_autoflush:
 			yield
 
-	def vacuum(self, into_file: Optional[str] = None, allow_vacuum_into_fallback: bool = True):
+	def vacuum(self, into_file: Optional[str] = None, allow_vacuum_into_fallback: bool = True, use_memory_tempfile: bool = False):
 		# https://www.sqlite.org/lang_vacuum.html
+
+		#use in-memory temporary file if configured: https://www.sqlite.org/pragma.html#pragma_temp_store
+		if use_memory_tempfile:
+			self.session.execute(text('PRAGMA temp_store = 2'))
+
 		if into_file is not None:
 			if self.__supports_vacuum_into():
 				self.session.execute(text('VACUUM INTO :into_file').bindparams(into_file=str(into_file)))

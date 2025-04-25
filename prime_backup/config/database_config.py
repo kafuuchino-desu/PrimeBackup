@@ -9,6 +9,7 @@ class CompactDatabaseConfig(CrontabJobSetting):
 	interval = None
 	crontab = '0 7 * * 0'
 	jitter = Duration('1m')
+	use_memory_tempfile = False
 
 
 class BackUpDatabaseConfig(CrontabJobSetting):
